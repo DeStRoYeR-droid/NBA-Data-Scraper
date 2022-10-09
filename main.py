@@ -20,8 +20,9 @@ def get_coach_info(year : int):
         
     print (tabulate(values , headers = ["Name" , "IsAssistant" , "Team"]))
 
-def get_team_info():
-    data = requests.get(BASE_URL + "/prod/v2/2022/teams.json").json()["league"]["standard"]
+def get_team_info(year : int):
+    extension = f"/data/prod/v2/{year}/teams.json"
+    data = requests.get(BASE_URL + extension).json()["league"]["standard"]
     
     values = []
     for value in data:
@@ -38,7 +39,7 @@ def get_team_info():
     print (tabulate(values , headers = ["Name" , "Conference" , "City", "TriCode"]))
   
 def get_team_stats(year : int):
-    extension = "/data/10s/prod/v1/2021/team_stats_rankings.json"
+    extension = f"/data/10s/prod/v1/{year}/team_stats_rankings.json"
     data = requests.get(BASE_URL + extension).json()["league"]["standard"]["regularSeason"]["teams"]
     
     values = []
@@ -75,7 +76,11 @@ def main():
                 get_coach_info(year)
                 
         elif (choice == 2):
-            get_team_info()
+            year = int(input("Please enter the year "))
+            if (year < 2019 or year > datetime.datetime.now().year):
+                print ("Data not available")
+            else:
+                get_team_info(year)
             
         elif (choice == 3):
             year = int(input("Please enter the year "))
