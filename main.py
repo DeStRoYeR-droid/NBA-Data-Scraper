@@ -36,6 +36,25 @@ def get_team_info():
         values.append(teamInfo)
         
     print (tabulate(values , headers = ["Name" , "Conference" , "City", "TriCode"]))
+  
+def get_team_stats(year : int):
+    extension = "/data/10s/prod/v1/2021/team_stats_rankings.json"
+    data = requests.get(BASE_URL + extension).json()["league"]["standard"]["regularSeason"]["teams"]
+    
+    values = []
+    
+    for value in data:
+        teamInfo = []
+        teamInfo.append(f"{value['name']} {value['nickname']}")
+        teamInfo.append(value['ppg']['avg'])
+        teamInfo.append(eval(f"{value['drpg']['avg']} + {value['orpg']['avg']}"))
+        teamInfo.append(value['apg']['avg'])
+        teamInfo.append(value['spg']['avg'])
+        teamInfo.append(value['bpg']['avg'])
+        
+        values.append(teamInfo)
+        
+    print (tabulate(values, headers = ["Team Name" , "PPG (Avg)" , "RPG (Avg)" , "APG (Avg)" , "SPG (Avg)" , "BPG (Avg)"]))
     
 
 def main():
@@ -44,6 +63,7 @@ def main():
         print ("Welcome to the NBA Menu")
         print ("1. Show data of coaches ")
         print ("2. Get team information ")
+        print ("3. Get team stats ")
         print ("69. Exit the menu")        
         choice = int(input("Please enter your choice "))
         
@@ -57,6 +77,13 @@ def main():
         elif (choice == 2):
             get_team_info()
             
+        elif (choice == 3):
+            year = int(input("Please enter the year "))
+            if (year < 2015 or year > datetime.datetime.now().year):
+                print ("Data not available")
+            else:
+                get_team_stats(year)
+                
         elif (choice == 69):
             run = False
             
