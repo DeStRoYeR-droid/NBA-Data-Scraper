@@ -20,6 +20,34 @@ def get_coach_info(year : int):
         
     print (tabulate(values , headers = ["Name" , "IsAssistant" , "Team"]))
 
+def get_team(year : int, teamID : str):
+    extension = f"/data/1h/prod/{year}/teams_config.json"
+    data = requests.get(BASE_URL + extension).json()["teams"]["config"]
+    
+    for value in data:
+        if (value["teamId"] == teamID):
+            return value["ttsName"]
+
+def get_playoff_stats(year : int):
+    extension = f"/data/10s/prod/v1/{year}/playoffsBracket.json"
+    data = requests.get(BASE_URL + extension).json()["series"]
+    
+    for value in data:
+        print (f"=================================")
+        print (f"Conference - {value['confName']}\t")
+        print (f"Round      - {value['roundNum']}\t\t\t")
+        print (f"-------------------------------")
+        print (f"{get_team(2016, value['bottomRow']['teamId'])}\t\t")
+        print (f"\tSeed -  {value['bottomRow']['seedNum']}\t\t")
+        print (f"\tWins -  {value['bottomRow']['wins']}\t\t")
+        print (f"{get_team(2016, value['topRow']['teamId'])}\t\t")
+        print (f"\tSeed -  {value['topRow']['seedNum']}\t\t")
+        print (f"\tWins -  {value['topRow']['wins']}\t\t")
+        print (f"------------------------------")
+        print (f"Result - {value['summaryStatusText']}\t\t")
+        print (f"=================================")
+        print ()
+
 def get_team_info(year : int):
     extension = f"/data/prod/v2/{year}/teams.json"
     data = requests.get(BASE_URL + extension).json()["league"]["standard"]
@@ -64,7 +92,8 @@ def main():
         print ("Welcome to the NBA Menu")
         print ("1. Show data of coaches ")
         print ("2. Get team information ")
-        print ("3. Get team stats ")
+        print ("3. Get team stats")
+        print ("4. Get playoff stats")
         print ("69. Exit the menu")        
         choice = int(input("Please enter your choice "))
         
@@ -88,6 +117,13 @@ def main():
                 print ("Data not available")
             else:
                 get_team_stats(year)
+            
+        elif (choice == 4):
+            year = int(input("Please enter the year "))
+            if (year < 2016 or year > 2020):
+                print ("Data not available")
+            else:
+                get_playoff_stats(year)
                 
         elif (choice == 69):
             run = False
