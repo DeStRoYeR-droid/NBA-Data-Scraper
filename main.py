@@ -28,6 +28,28 @@ def get_team(year : int, teamID : str):
         if (value["teamId"] == teamID):
             return value["ttsName"]
 
+def get_players_info(year : int):
+    extension = f"/data/10s/prod/v1/{year}/players.json"
+    data = requests.get(BASE_URL + extension).json()["league"]["standard"]
+    
+    players = [["Index" , "FirstName" , "LastName" , "Height (m)", "Height (feet)" , "Weight (lb)" , "Weight (kg)" , "Country" , "Position" , "Debut Year"]]
+    for value in data:
+        player = []
+        player.append(len(players))
+        player.append(value['firstName'])
+        player.append(value['lastName'])
+        player.append(value['heightMeters'])
+        player.append(value['heightFeet'] + '\' ' + value['heightInches'] + '\"')
+        player.append(value['weightPounds'] + "lb")
+        player.append(value['weightKilograms'] + "kg")
+        player.append(value['country'])
+        player.append(value['pos'])
+        player.append(value['nbaDebutYear'])
+        
+        players.append(player)
+        
+    return players
+
 def get_playoff_stats(year : int):
     extension = f"/data/10s/prod/v1/{year}/playoffsBracket.json"
     data = requests.get(BASE_URL + extension).json()["series"]
@@ -94,6 +116,7 @@ def main():
         print ("2. Get team information ")
         print ("3. Get team stats")
         print ("4. Get playoff stats")
+        print ("5. Get players info by season")
         print ("69. Exit the menu")        
         choice = int(input("Please enter your choice "))
         
@@ -124,6 +147,13 @@ def main():
                 print ("Data not available")
             else:
                 get_playoff_stats(year)
+                
+        elif (choice == 5):
+            year = int(input("Please enter the year "))
+            if (year < 2012 or year > 2022):
+                print ("Data not available")
+            else:
+                print (tabulate(get_players_info(year) , headers="firstrow"))
                 
         elif (choice == 69):
             run = False
